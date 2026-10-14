@@ -201,14 +201,14 @@ runs:
         : Install kcov (Linux)
         sudo apt-get update
         sudo apt-get install kcov
-      if: ${{ runner.os == "linux" }}
+      if: ${{ runner.os == 'linux' }}
       continue-on-error: true
 
     - run: |
         : Install kcov (macOS)
         brew update
         brew install kcov
-      if: ${{ runner.os == "macos" }}
+      if: ${{ runner.os == 'macos' }}
       continue-on-error: true
 
     - run: |
