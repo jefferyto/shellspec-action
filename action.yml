@@ -294,10 +294,11 @@ runs:
         EOF
         }
 
-        kcov="$INPUT_KCOV"
-        if ! kcov --version >/dev/null 2>&1; then
-          kcov="false"
-        fi
+        #kcov="$INPUT_KCOV"
+        #if ! kcov --version >/dev/null 2>&1; then
+        #  kcov="false"
+        #fi
+        kcov="false"
 
         args=( \
           --format documentation \
