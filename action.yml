@@ -216,7 +216,7 @@ runs:
     - run: |
         : Set up
         epoch=$((`TZ=GMT0 date \
-          +"((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140)\
+          +"((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140) \
           *86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)"`))
         dir=".shellspec_action.$epoch.$$"
         mkdir "$dir" "$dir/coverage" "$dir/repo" "$dir/report"
@@ -224,6 +224,7 @@ runs:
         echo "coverage-dir=$dir/coverage" >> $GITHUB_OUTPUT
         echo "repo-dir=$dir/repo" >> $GITHUB_OUTPUT
         echo "report-dir=$dir/report" >> $GITHUB_OUTPUT
+        echo "short-sha=${GITHUB_SHA:0:12}" >> $GITHUB_OUTPUT
       shell: bash
       id: setup
 
@@ -401,14 +402,32 @@ runs:
       uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:
-        name: ${{ format('{0}shellspec-report-{1}{2}', inputs.artifact-prefix, github.run_attempt, inputs.artifact-suffix) }}
+        name: >-
+          ${{
+            format(
+              '{0}shellspec-report-{1}-{2}{3}',
+              inputs.artifact-prefix,
+              steps.setup.outputs.short-sha,
+              github.run_attempt,
+              inputs.artifact-suffix
+            )
+          }}
         path: ${{ steps.setup.outputs.report-dir }}
 
     - name: Upload coverage
       uses: actions/upload-artifact@v7
       if: ${{ !cancelled() }}
       with:
-        name: ${{ format('{0}shellspec-coverage-{1}{2}', inputs.artifact-prefix, github.run_attempt, inputs.artifact-suffix) }}
+        name: >-
+          ${{
+            format(
+              '{0}shellspec-coverage-{1}-{2}{3}',
+              inputs.artifact-prefix,
+              steps.setup.outputs.short-sha,
+              github.run_attempt,
+              inputs.artifact-suffix
+            )
+          }}
         path: ${{ steps.setup.outputs.coverage-dir }}
 
     - run: |
