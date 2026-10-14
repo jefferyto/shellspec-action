@@ -300,6 +300,9 @@ runs:
         fi
 
         args=( \
+          --no-profile \
+          --no-boost \
+          --no-quick \
           --format documentation \
           --color \
           --reportdir "$GITHUB_WORKSPACE/$SETUP_REPORT_DIR" \
