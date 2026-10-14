@@ -198,7 +198,7 @@ runs:
   using: composite
   steps:
     - run: |
-        : Install kcov (Linux)
+        : Install kcov \(Linux\)
         sudo apt-get update
         sudo apt-get install kcov
       shell: bash
@@ -206,7 +206,7 @@ runs:
       continue-on-error: true
 
     - run: |
-        : Install kcov (macOS)
+        : Install kcov \(macOS\)
         brew update
         brew install kcov
       shell: bash
