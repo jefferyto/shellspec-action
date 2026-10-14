@@ -1,0 +1,415 @@
+name: Run ShellSpec
+description: A GitHub Action to run ShellSpec
+author: jefferyto
+
+inputs:
+  shellspec-ref:
+    description: >
+      The branch, tag or SHA of ShellSpec to use
+    default: "f2d13f991885ef44e6b54e571e0842222251b111"
+
+  project-root:
+    description: >
+      Relative path under $GITHUB_WORKSPACE for the root of the project
+      directory, i.e. where the ".shellspec" file is located
+    default: ""
+
+  spec-paths:
+    description: >
+      Specfile paths, directories, and/or patterns (relative to project
+      root, comma and/or newline separated) to pass to ShellSpec
+    default: ""
+
+  artifact-prefix:
+    description: >
+      Prefix for names of artifacts uploaded by this action
+    default: ""
+
+  artifact-suffix:
+    description: >
+      Suffix for names of artifacts uploaded by this action
+    default: ""
+
+  shell:
+    description: >
+      Shell to test with
+    default: ""
+
+  require:
+    description: >
+      Modules (comma and/or newline separated) to require
+    default: ""
+
+  options:
+    description: >
+      Additional options file (relative to project root) to use
+    default: ""
+
+  load-path:
+    description: >
+      Paths (relative to project root, comma and/or newline separated)
+      to add to $SHELLSPEC_LOAD_PATH
+    default: ""
+
+  helperdir:
+    description: >
+      Directory (relative to project root) to load helper files
+    default: ""
+
+  path-env-var:
+    description: >
+      PATH environment variable to set at startup
+    default: ""
+
+  sandbox:
+    description: >
+      Set to "true" to force the use of mocks instead of actual
+      commands, "false" to disable
+    default: ""
+
+  sandbox-path:
+    description: >
+      Sandbox path to set
+    default: ""
+
+  execdir:
+    description: >
+      Execution directory of each specfile
+    default: ""
+
+  env-vars:
+    description: >
+      List of environment variables (NAME=VALUE, comma and/or newline
+      separated) to set
+    default: ""
+
+  env-from:
+    description: >
+      Shell script file (relative to project root) to use to set
+      environment variables
+    default: ""
+
+  warning-as-failure:
+    description: >
+      Set to "true" to treat warning as failure, "false" to disable
+    default: ""
+
+  fail-fast:
+    description: >
+      Abort the run after this number of failures, set to "0" to disable
+    default: ""
+
+  fail-no-examples:
+    description: >
+      Set to "true" to fail if no examples found, "false" to disable
+    default: ""
+
+  fail-low-coverage:
+    description: >
+      Set to "true" to fail on low coverage, "false" to disable
+    default: ""
+
+  random:
+    description: >
+      Run examples by this random type
+    default: ""
+
+  xtrace:
+    description: >
+      Set to "true" to run examples with trace output of evaluation
+    default: ""
+
+  xtrace-only:
+    description: >
+      Set to "true" to run examples with trace output only
+    default: ""
+
+  focus:
+    description: >
+      Set to "true" to run focused groups/examples only
+    default: ""
+
+  pattern:
+    description: >
+      Load files matching this pattern
+    default: ""
+
+  example:
+    description: >
+      Run examples whose names include this pattern
+    default: ""
+
+  tag:
+    description: >
+      Run examples with this tag
+    default: ""
+
+  default-path:
+    description: >
+      Default path to look for examples
+    default: ""
+
+  dereference:
+    description: >
+      Set to "true" to dereference all symlinks in specfile patterns
+    default: ""
+
+  kcov:
+    description: >
+      Set to "true" to enable coverage using kcov, "false" to disable
+    default: ""
+
+  kcov-options:
+    description: >
+      Additional kcov options (comma and/or newline separated)
+    default: ""
+
+  count:
+    description: >
+      Set to "true" to count the number of specfiles and examples
+    default: ""
+
+  list:
+    description: >
+      List these specfiles/examples
+    default: ""
+
+  syntax-check:
+    description: >
+      Set to "true" to check the syntax of specfiles
+    default: ""
+
+  translate:
+    description: >
+      Set to "true" to output translated specfiles
+    default: ""
+
+  task-list:
+    description: >
+      Set to "true" to show the task list
+    default: ""
+
+  task:
+    description: >
+      Run this task
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - run: |
+        : Install kcov (Linux)
+        sudo apt-get update
+        sudo apt-get install kcov
+      if: ${{ runner.os == "linux" }}
+      continue-on-error: true
+
+    - run: |
+        : Install kcov (macOS)
+        brew update
+        brew install kcov
+      if: ${{ runner.os == "macos" }}
+      continue-on-error: true
+
+    - run: |
+        : Set up
+        epoch=$((`TZ=GMT0 date \
+          +"((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140)\
+          *86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)"`))
+        dir=".shellspec_action.$epoch.$$"
+        mkdir "$dir" "$dir/coverage" "$dir/repo" "$dir/report"
+        echo "action-dir=$dir" >> $GITHUB_OUTPUT
+        echo "coverage-dir=$dir/coverage" >> $GITHUB_OUTPUT
+        echo "repo-dir=$dir/repo" >> $GITHUB_OUTPUT
+        echo "report-dir=$dir/report" >> $GITHUB_OUTPUT
+      shell: bash
+      id: setup
+
+    - uses: actions/checkout@v7
+      with:
+        repository: shellspec/shellspec
+        ref: ${{ inputs.shellspec-ref }}
+        path: ${{ steps.setup.outputs.repo-dir }}
+        clean: "false"
+
+    - run: |
+        : Run ShellSpec
+        true_opt() {
+          if [ "$2" == "true" ]; then
+            args+=("$1")
+          fi
+        }
+        bool_opt() {
+          if [ -n "$2" ]; then
+            if [ "$2" == "true" ]; then
+              args+=("$1")
+            else
+              args+=("--no-${1#--}")
+            fi
+          fi
+        }
+        num_opt() {
+          if [ -n "$2" ]; then
+            if [ "$2" -gt 0 ]; then
+              args+=("$1=$2")
+            else
+              args+=("--no-${1#--}")
+            fi
+          fi
+        }
+        val_opt() {
+          if [ -n "$2" ]; then
+            args+=("$1" "$2")
+          fi
+        }
+        multi_opt() {
+          while IFS= read -r line; do
+            space="${line%%[![:space:]]*}"
+            line="${line#"$space"}"
+            space="${line##*[![:space:]]}"
+            line="${line%"$space"}"
+            if [ -z "$line" ]; then
+              continue
+            fi
+            line="$line,"
+            while [ -n "$line" ]; do
+              val="${line%%,*}"
+              space="${val%%[![:space:]]*}"
+              val="${val#"$space"}"
+              space="${val##*[![:space:]]}"
+              val="${val%"$space"}"
+              if [ -n "$val" ]; then
+                if [ -n "$1" ]; then
+                  args+=("$1" "$val")
+                else
+                  args+=("$val")
+                fi
+              fi
+              line="${line#*,}"
+            done
+          done << EOF
+        $2
+        EOF
+        }
+
+        kcov="$INPUT_KCOV"
+        if ! kcov --version >/dev/null 2>&1; then
+          kcov="false"
+        fi
+
+        args=( \
+          --format documentation \
+          --color \
+          --reportdir "$GITHUB_WORKSPACE/$SETUP_REPORT_DIR" \
+          --output documentation \
+          --output tap \
+          --output junit \
+          --covdir "$GITHUB_WORKSPACE/$SETUP_COVERAGE_DIR" \
+        )
+
+        val_opt   --shell               "$INPUT_SHELL"
+        multi_opt --require             "$INPUT_REQUIRE"
+        val_opt   --options             "$INPUT_OPTIONS"
+        multi_opt --load-path           "$INPUT_LOAD_PATH"
+        val_opt   --helperdir           "$INPUT_HELPERDIR"
+        val_opt   --path                "$INPUT_PATH_ENV_VAR"
+        bool_opt  --sandbox             "$INPUT_SANDBOX"
+        val_opt   --sandbox-path        "$INPUT_SANDBOX_PATH"
+        val_opt   --execdir             "$INPUT_EXECDIR"
+        multi_opt --env                 "$INPUT_ENV_VARS"
+        val_opt   --env-from            "$INPUT_ENV_FROM"
+        bool_opt  --warning-as-failure  "$INPUT_WARNING_AS_FAILURE"
+        num_opt   --fail-fast           "$INPUT_FAIL_FAST"
+        bool_opt  --fail-no-examples    "$INPUT_FAIL_NO_EXAMPLES"
+        bool_opt  --fail-low-coverage   "$INPUT_FAIL_LOW_COVERAGE"
+
+        val_opt   --random              "$INPUT_RANDOM"
+        true_opt  --xtrace              "$INPUT_XTRACE"
+        true_opt  --xtrace-only         "$INPUT_XTRACE_ONLY"
+
+        true_opt  --focus               "$INPUT_FOCUS"
+        val_opt   --pattern             "$INPUT_PATTERN"
+        val_opt   --example             "$INPUT_EXAMPLE"
+        val_opt   --tag                 "$INPUT_TAG"
+        val_opt   --default-path        "$INPUT_DEFAULT_PATH"
+        true_opt  --dereference         "$INPUT_DEREFERENCE"
+
+        bool_opt  --kcov                "$kcov"
+        multi_opt --kcov-options        "$INPUT_KCOV_OPTIONS"
+
+        true_opt  --count               "$INPUT_COUNT"
+        val_opt   --list                "$INPUT_LIST"
+        true_opt  --syntax-check        "$INPUT_SYNTAX_CHECK"
+        true_opt  --translate           "$INPUT_TRANSLATE"
+        true_opt  --task                "$INPUT_TASK_LIST"
+        val_opt   --task                "$INPUT_TASK"
+
+        multi_opt ""                    "$INPUT_SPEC_PATHS"
+
+        if [ -n "$INPUT_PROJECT_ROOT" ]; then
+          cd "$INPUT_PROJECT_ROOT"
+        fi
+
+        "$GITHUB_WORKSPACE/$SETUP_REPO_DIR/shellspec" "${args[@]}"
+
+      shell: bash
+      env:
+        SETUP_COVERAGE_DIR: ${{ steps.setup.outputs.coverage-dir }}
+        SETUP_REPO_DIR: ${{ steps.setup.outputs.repo-dir }}
+        SETUP_REPORT_DIR: ${{ steps.setup.outputs.report-dir }}
+        INPUT_PROJECT_ROOT: ${{ inputs.project-root }}
+        INPUT_SPEC_PATHS: ${{ inputs.spec-paths }}
+        INPUT_SHELL: ${{ inputs.shell }}
+        INPUT_REQUIRE: ${{ inputs.require }}
+        INPUT_OPTIONS: ${{ inputs.options }}
+        INPUT_LOAD_PATH: ${{ inputs.load-path }}
+        INPUT_HELPERDIR: ${{ inputs.helperdir }}
+        INPUT_PATH_ENV_VAR: ${{ inputs.path-env-var }}
+        INPUT_SANDBOX: ${{ inputs.sandbox }}
+        INPUT_SANDBOX_PATH: ${{ inputs.sandbox-path }}
+        INPUT_EXECDIR: ${{ inputs.execdir }}
+        INPUT_ENV_VARS: ${{ inputs.env-vars }}
+        INPUT_ENV_FROM: ${{ inputs.env-from }}
+        INPUT_WARNING_AS_FAILURE: ${{ inputs.warning-as-failure }}
+        INPUT_FAIL_FAST: ${{ inputs.fail-fast }}
+        INPUT_FAIL_NO_EXAMPLES: ${{ inputs.fail-no-examples }}
+        INPUT_FAIL_LOW_COVERAGE: ${{ inputs.fail-low-coverage }}
+        INPUT_RANDOM: ${{ inputs.random }}
+        INPUT_XTRACE: ${{ inputs.xtrace }}
+        INPUT_XTRACE_ONLY: ${{ inputs.xtrace-only }}
+        INPUT_FOCUS: ${{ inputs.focus }}
+        INPUT_PATTERN: ${{ inputs.pattern }}
+        INPUT_EXAMPLE: ${{ inputs.example }}
+        INPUT_TAG: ${{ inputs.tag }}
+        INPUT_DEFAULT_PATH: ${{ inputs.default-path }}
+        INPUT_DEREFERENCE: ${{ inputs.dereference }}
+        INPUT_KCOV: ${{ inputs.kcov }}
+        INPUT_KCOV_OPTIONS: ${{ inputs.kcov-options }}
+        INPUT_COUNT: ${{ inputs.count }}
+        INPUT_LIST: ${{ inputs.list }}
+        INPUT_SYNTAX_CHECK: ${{ inputs.syntax-check }}
+        INPUT_TRANSLATE: ${{ inputs.translate }}
+        INPUT_TASK_LIST: ${{ inputs.task-list }}
+        INPUT_TASK: ${{ inputs.task }}
+
+    - name: Upload report
+      uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: ${{ format('{0}shellspec-report-{1}{2}', inputs.artifact-prefix, github.run_attempt, inputs.artifact-suffix) }}
+        path: ${{ steps.setup.outputs.report-dir }}
+
+    - name: Upload coverage
+      uses: actions/upload-artifact@v7
+      if: ${{ !cancelled() }}
+      with:
+        name: ${{ format('{0}shellspec-coverage-{1}{2}', inputs.artifact-prefix, github.run_attempt, inputs.artifact-suffix) }}
+        path: ${{ steps.setup.outputs.coverage-dir }}
+
+    - run: |
+        : Clean up
+        rm -rf "$SETUP_ACTION_DIR"
+      shell: bash
+      if: ${{ !cancelled() }}
+      env:
+        SETUP_ACTION_DIR: ${{ steps.setup.outputs.action-dir }}
