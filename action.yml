@@ -207,7 +207,7 @@ runs:
 
     - run: |
         : Install kcov on macOS
-        brew update
+        brew update-if-needed
         brew install kcov
       shell: bash
       if: ${{ runner.os == 'macos' }}
