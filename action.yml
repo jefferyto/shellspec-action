@@ -434,6 +434,7 @@ runs:
             )
           }}
         path: ${{ steps.setup.outputs.coverage-dir }}
+        if-no-files-found: "ignore"
 
     - run: |
         : Clean up
