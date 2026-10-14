@@ -220,13 +220,20 @@ runs:
           *86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)"`))
         dir=".shellspec_action.$epoch.$$"
         mkdir "$dir" "$dir/coverage" "$dir/repo" "$dir/report"
+        artifact_id="$PR_PREFIX${GITHUB_SHA:0:7}-$GITHUB_RUN_ATTEMPT"
         echo "action-dir=$dir" >> $GITHUB_OUTPUT
         echo "coverage-dir=$dir/coverage" >> $GITHUB_OUTPUT
         echo "repo-dir=$dir/repo" >> $GITHUB_OUTPUT
         echo "report-dir=$dir/report" >> $GITHUB_OUTPUT
-        echo "short-sha=${GITHUB_SHA:0:12}" >> $GITHUB_OUTPUT
+        echo "artifact-id=$artifact_id" >> $GITHUB_OUTPUT
       shell: bash
       id: setup
+      env:
+        PR_PREFIX: >-
+          ${{
+            github.event_name == 'pull_request' &&
+              format('PR{0}-', github.event.number) || ''
+          }}
 
     - uses: actions/checkout@v7
       with:
@@ -405,10 +412,9 @@ runs:
         name: >-
           ${{
             format(
-              '{0}shellspec-report-{1}-{2}{3}',
+              '{0}shellspec-report-{1}{2}',
               inputs.artifact-prefix,
-              steps.setup.outputs.short-sha,
-              github.run_attempt,
+              steps.setup.outputs.artifact-id,
               inputs.artifact-suffix
             )
           }}
@@ -421,10 +427,9 @@ runs:
         name: >-
           ${{
             format(
-              '{0}shellspec-coverage-{1}-{2}{3}',
+              '{0}shellspec-coverage-{1}{2}',
               inputs.artifact-prefix,
-              steps.setup.outputs.short-sha,
-              github.run_attempt,
+              steps.setup.outputs.artifact-id,
               inputs.artifact-suffix
             )
           }}
