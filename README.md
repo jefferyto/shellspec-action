@@ -13,7 +13,7 @@ Almost all of the available options correspond to ShellSpec's
 - uses: jefferyto/shellspec-action@v1
   with:
     # The branch, tag or SHA of ShellSpec to use
-    # Default: f2d13f9
+    # Default: f2d13f9 (latest development version)
     shellspec-ref: ""
 
     # Relative path under $GITHUB_WORKSPACE for the root of the project
