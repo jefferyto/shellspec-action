@@ -274,20 +274,16 @@ runs:
         }
         multi_opt() {
           while IFS= read -r line; do
-            space="${line%%[![:space:]]*}"
-            line="${line#"$space"}"
-            space="${line##*[![:space:]]}"
-            line="${line%"$space"}"
+            line="${line#"${line%%[![:space:]]*}"}"
+            line="${line%"${line##*[![:space:]]}"}"
             if [ -z "$line" ]; then
               continue
             fi
             line="$line,"
             while [ -n "$line" ]; do
               val="${line%%,*}"
-              space="${val%%[![:space:]]*}"
-              val="${val#"$space"}"
-              space="${val##*[![:space:]]}"
-              val="${val%"$space"}"
+              val="${val#"${val%%[![:space:]]*}"}"
+              val="${val%"${val##*[![:space:]]}"}"
               if [ -n "$val" ]; then
                 if [ -n "$1" ]; then
                   args+=("$1" "$val")
