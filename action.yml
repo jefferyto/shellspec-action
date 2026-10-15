@@ -359,10 +359,7 @@ runs:
 
         multi_opt ""                    "$INPUT_SPEC_PATHS"
 
-        if [ -n "$INPUT_PROJECT_ROOT" ]; then
-          cd "$INPUT_PROJECT_ROOT"
-        fi
-
+        cd "$GITHUB_WORKSPACE/$INPUT_PROJECT_ROOT"
         "$GITHUB_WORKSPACE/$SETUP_REPO_DIR/shellspec" "${args[@]}"
 
       shell: bash
