@@ -15,15 +15,18 @@ concurrency:
 
 jobs:
   test:
-    name: Test on ${{ matrix.os.name }}
+    name: ${{ matrix.os.name }}
     strategy:
       matrix:
         os:
-          - name: ubuntu
+          - name: Ubuntu
+            suffix: ubuntu
             runner: ubuntu-latest
-          - name: macos
+          - name: macOS
+            suffix: macos
             runner: macos-latest
-          - name: windows
+          - name: Windows
+            suffix: windows
             runner: windows-latest
       fail-fast: false
     runs-on: ${{ matrix.os.runner }}
@@ -31,6 +34,6 @@ jobs:
       - uses: actions/checkout@v7
       - uses: $/
         with:
-          artifact-suffix: ${{ format('-{0}', matrix.os.name) }}
+          artifact-suffix: ${{ format('-{0}', matrix.os.suffix) }}
           shell: bash
           kcov: true
