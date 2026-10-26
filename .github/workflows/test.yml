@@ -1,4 +1,4 @@
-name: Test on Ubuntu / macOS / Windows Git Bash
+name: Test
 
 on:
   push:

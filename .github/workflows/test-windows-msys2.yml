@@ -1,4 +1,4 @@
-name: Test on Windows MSYS2
+name: Windows MSYS2 Test
 
 on:
   push:
