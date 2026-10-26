@@ -24,7 +24,7 @@ jobs:
         with:
           msystem: UCRT64
           update: true
-      - name: Setup environment
+      - name: Set up environment
         run: |
           echo "MSYSTEM=UCRT64" >> "$GITHUB_ENV"
           echo "MSYS2_PATH_TYPE=minimal" >> "$GITHUB_ENV"
