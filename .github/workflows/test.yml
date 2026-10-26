@@ -1,0 +1,36 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ format('{0}-{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Test on ${{ matrix.os.name }}
+    strategy:
+      matrix:
+        os:
+          - name: ubuntu
+            runner: ubuntu-latest
+          - name: macos
+            runner: macos-latest
+          - name: windows
+            runner: windows-latest
+      fail-fast: false
+    runs-on: ${{ matrix.os.runner }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: $/
+        with:
+          artifact-suffix: ${{ format('-{0}', matrix.os.name) }}
+          shell: bash
+          kcov: true
