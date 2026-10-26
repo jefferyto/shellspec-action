@@ -303,17 +303,19 @@ runs:
           kcov="false"
         fi
 
+        workspace="$(pwd)"
+
         args=( \
           --no-profile \
           --no-boost \
           --no-quick \
           --format documentation \
           --color \
-          --reportdir "$GITHUB_WORKSPACE/$SETUP_REPORT_DIR" \
+          --reportdir "$workspace/$SETUP_REPORT_DIR" \
           --output documentation \
           --output tap \
           --output junit \
-          --covdir "$GITHUB_WORKSPACE/$SETUP_COVERAGE_DIR" \
+          --covdir "$workspace/$SETUP_COVERAGE_DIR" \
         )
 
         val_opt   --shell               "$INPUT_SHELL"
@@ -355,8 +357,8 @@ runs:
 
         multi_opt ""                    "$INPUT_SPEC_PATHS"
 
-        cd "$GITHUB_WORKSPACE/$INPUT_PROJECT_ROOT"
-        "$GITHUB_WORKSPACE/$SETUP_REPO_DIR/shellspec" "${args[@]}"
+        cd "$workspace/$INPUT_PROJECT_ROOT"
+        "$workspace/$SETUP_REPO_DIR/shellspec" "${args[@]}"
 
       shell: bash
       env:
