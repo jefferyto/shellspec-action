@@ -1,0 +1,32 @@
+name: Windows Cygwin Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ format('{0}-{1}', github.workflow, github.ref) }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    name: Windows Cygwin
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: cygwin/cygwin-install-action@v7
+      - name: Set up environment
+        run: |
+          echo "set -o igncr" >> "$HOME/.bash_env"
+          echo "BASH_ENV=$HOME/.bash_env" >> "$GITHUB_ENV"
+        shell: bash.exe --noprofile --norc -e -o pipefail -o igncr {0}
+      - uses: $/
+        with:
+          artifact-suffix: "-windows-cygwin"
+          shell: bash
+          kcov: true
