@@ -25,8 +25,8 @@ jobs:
           - name: macOS
             suffix: macos
             runner: macos-latest
-          - name: Windows
-            suffix: windows
+          - name: Windows Git Bash
+            suffix: windows-gitbash
             runner: windows-latest
       fail-fast: false
     runs-on: ${{ matrix.os.runner }}
