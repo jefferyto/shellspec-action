@@ -199,8 +199,10 @@ runs:
   steps:
     - run: |
         : Install kcov on Linux
-        sudo apt-get update
-        sudo apt-get install kcov
+        if [ "$(lsb_release -rs)" != "24.04" ]; then
+          sudo apt-get update
+          sudo apt-get install kcov
+        fi
       shell: bash
       if: ${{ runner.os == 'linux' }}
       continue-on-error: true

@@ -4,6 +4,7 @@
 
 ### Fixed
 
+* Exit code 100 on ubuntu-24.04
 * Report and coverage output not uploaded as artifacts on Windows
   runners
 
