@@ -12,7 +12,7 @@ inputs:
     description: >
       Relative path under $GITHUB_WORKSPACE for the root of the project
       directory, i.e. where the ".shellspec" file is located
-    default: ""
+    default: "."
 
   spec-paths:
     description: >

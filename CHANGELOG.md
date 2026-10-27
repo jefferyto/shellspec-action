@@ -6,6 +6,10 @@
 
 * `shellspec-shell` option
 
+### Changed
+
+* `project-root` default value is now `.` instead of the empty string
+
 ## [v1.0.1] - 2026-10-27
 
 ### Fixed

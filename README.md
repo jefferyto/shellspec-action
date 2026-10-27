@@ -18,6 +18,7 @@ Almost all of the available options correspond to ShellSpec's
 
     # Relative path under $GITHUB_WORKSPACE for the root of the project
     # directory, i.e. where the ".shellspec" file is located
+    # Default: "."
     project-root: ""
 
     # Specfile paths, directories, and/or patterns (relative to project
