@@ -2,6 +2,10 @@
 
 ## [v1.1.1-dev][Unreleased] - Unreleased
 
+### Fixed
+
+* Failure when called with `shell: zsh` and `kcov: true`
+
 ## [v1.1.0] - 2026-10-27
 
 ### Added

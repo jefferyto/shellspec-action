@@ -226,7 +226,7 @@ runs:
           +"((%Y-1600)*365+(%Y-1600)/4-(%Y-1600)/100+(%Y-1600)/400+1%j-1000-135140) \
           *86400+(1%H-100)*3600+(1%M-100)*60+(1%S-100)"`))
         dir=".shellspec_action.$epoch.$$"
-        mkdir "$dir" "$dir/coverage" "$dir/repo" "$dir/report"
+        mkdir "$dir" "$dir/repo"
         artifact_id="$PR_PREFIX${GITHUB_SHA:0:7}-$GITHUB_RUN_ATTEMPT"
         echo "action-dir=$dir" >> $GITHUB_OUTPUT
         echo "coverage-dir=$dir/coverage" >> $GITHUB_OUTPUT
