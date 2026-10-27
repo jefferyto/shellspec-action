@@ -310,7 +310,7 @@ runs:
           kcov="false"
         fi
 
-        workspace="$(pwd)"
+        workspace="$PWD"
 
         args=( \
           --no-profile \
