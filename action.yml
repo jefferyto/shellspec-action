@@ -364,7 +364,10 @@ runs:
 
         multi_opt ""                    "$INPUT_SPEC_PATHS"
 
-        printf 'Running shellspec with arguments: %s\n' "${args[*]}"
+        printf 'Running shellspec with:\n'
+        printf '  working directory: %s\n' "$INPUT_PROJECT_ROOT"
+        printf '  shell: %s\n' "$INPUT_SHELLSPEC_SHELL"
+        printf '  arguments: %s\n' "${args[*]}"
 
         cd "$workspace/$INPUT_PROJECT_ROOT"
         $INPUT_SHELLSPEC_SHELL "$workspace/$SETUP_REPO_DIR/shellspec" "${args[@]}"
