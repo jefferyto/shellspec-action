@@ -1,6 +1,6 @@
 # Changelog
 
-## [v1.0.2-dev][Unreleased] - Unreleased
+## [v1.1.0] - 2026-10-27
 
 ### Added
 
@@ -22,5 +22,5 @@
 
 * Initial release
 
-[Unreleased]: https://github.com/jefferyto/shellspec-action/compare/v1.0.1...main
+[v1.1.0]: https://github.com/jefferyto/shellspec-action/compare/v1.0.1...v1.1.0
 [v1.0.1]: https://github.com/jefferyto/shellspec-action/compare/v1.0.0...v1.0.1
