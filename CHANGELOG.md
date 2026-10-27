@@ -10,7 +10,7 @@
 
 ### Added
 
-* `shellspec-shell` option
+* `shellspec-shell` option to select the shell used to run ShellSpec
 
 ### Changed
 
