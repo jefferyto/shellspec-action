@@ -24,7 +24,7 @@ jobs:
         run: |
           echo "set -o igncr" >> "$HOME/.bash_env"
           echo "BASH_ENV=$HOME/.bash_env" >> "$GITHUB_ENV"
-        shell: bash.exe --noprofile --norc -e -o pipefail -o igncr {0}
+        shell: bash --noprofile --norc -e -o pipefail -o igncr {0}
       - uses: $/
         with:
           artifact-suffix: "-windows-cygwin"
