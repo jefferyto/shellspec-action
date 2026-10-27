@@ -2,6 +2,10 @@
 
 ## [v1.0.2-dev][Unreleased] - Unreleased
 
+### Added
+
+* `shellspec-shell` option
+
 ## [v1.0.1] - 2026-10-27
 
 ### Fixed

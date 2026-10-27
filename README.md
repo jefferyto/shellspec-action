@@ -24,6 +24,10 @@ Almost all of the available options correspond to ShellSpec's
     # root, comma and/or newline separated) to pass to ShellSpec
     spec-paths: ""
 
+    # Shell to run ShellSpec with
+    # Default: "sh"
+    shellspec-shell: ""
+
     # Prefix for names of artifacts uploaded by this action
     artifact-prefix: ""
 

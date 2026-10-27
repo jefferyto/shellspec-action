@@ -20,6 +20,11 @@ inputs:
       root, comma and/or newline separated) to pass to ShellSpec
     default: ""
 
+  shellspec-shell:
+    description: >
+      Shell to run ShellSpec with
+    default: "sh"
+
   artifact-prefix:
     description: >
       Prefix for names of artifacts uploaded by this action
@@ -362,7 +367,7 @@ runs:
         printf 'Running shellspec with arguments: %s\n' "${args[*]}"
 
         cd "$workspace/$INPUT_PROJECT_ROOT"
-        "$workspace/$SETUP_REPO_DIR/shellspec" "${args[@]}"
+        $INPUT_SHELLSPEC_SHELL "$workspace/$SETUP_REPO_DIR/shellspec" "${args[@]}"
 
       shell: bash
       env:
@@ -371,6 +376,7 @@ runs:
         SETUP_REPORT_DIR: ${{ steps.setup.outputs.report-dir }}
         INPUT_PROJECT_ROOT: ${{ inputs.project-root }}
         INPUT_SPEC_PATHS: ${{ inputs.spec-paths }}
+        INPUT_SHELLSPEC_SHELL: ${{ inputs.shellspec-shell }}
         INPUT_SHELL: ${{ inputs.shell }}
         INPUT_REQUIRE: ${{ inputs.require }}
         INPUT_OPTIONS: ${{ inputs.options }}
