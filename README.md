@@ -1,4 +1,4 @@
-# ShellSpec action
+# ShellSpec action 
 
 A GitHub Action to run [ShellSpec].
 
