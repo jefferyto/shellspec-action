@@ -229,9 +229,15 @@ runs:
         dir=".shellspec_action.$epoch.$$"
         mkdir "$dir" "$dir/repo"
 
+        temp="$RUNNER_TEMP"
+        if cygpath --version >/dev/null 2>&1; then
+          temp="$(cygpath "$RUNNER_TEMP")"
+        fi
+
         artifact_id="$PR_PREFIX${GITHUB_SHA:0:7}-$GITHUB_RUN_ATTEMPT"
 
         echo "workspace-dir=$PWD" >> "$GITHUB_OUTPUT"
+        echo "temp-dir=$temp" >> "$GITHUB_OUTPUT"
         echo "action-dir=$dir" >> "$GITHUB_OUTPUT"
         echo "coverage-dir=$dir/coverage" >> "$GITHUB_OUTPUT"
         echo "repo-dir=$dir/repo" >> "$GITHUB_OUTPUT"
@@ -317,6 +323,7 @@ runs:
         args=( \
           --no-profile \
           --no-boost \
+          --tmpdir "$SETUP_TEMP_DIR" \
           --no-quick \
           --format documentation \
           --color \
@@ -377,6 +384,7 @@ runs:
       shell: bash
       env:
         SETUP_WORKSPACE_DIR: ${{ steps.setup.outputs.workspace-dir }}
+        SETUP_TEMP_DIR: ${{ steps.setup.outputs.temp-dir }}
         SETUP_COVERAGE_DIR: ${{ steps.setup.outputs.coverage-dir }}
         SETUP_REPO_DIR: ${{ steps.setup.outputs.repo-dir }}
         SETUP_REPORT_DIR: ${{ steps.setup.outputs.report-dir }}

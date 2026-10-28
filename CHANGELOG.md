@@ -2,6 +2,10 @@
 
 ## [v1.1.2-dev][Unreleased] - Unreleased
 
+### Changed
+
+* ShellSpec will now use `$RUNNER_TEMP` for its temporary directory
+
 ## [v1.1.1] - 2026-10-28
 
 ### Fixed
