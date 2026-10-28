@@ -228,6 +228,7 @@ runs:
         dir=".shellspec_action.$epoch.$$"
         mkdir "$dir" "$dir/repo"
         artifact_id="$PR_PREFIX${GITHUB_SHA:0:7}-$GITHUB_RUN_ATTEMPT"
+        echo "workspace-dir=$PWD" >> $GITHUB_OUTPUT
         echo "action-dir=$dir" >> $GITHUB_OUTPUT
         echo "coverage-dir=$dir/coverage" >> $GITHUB_OUTPUT
         echo "repo-dir=$dir/repo" >> $GITHUB_OUTPUT
@@ -310,19 +311,17 @@ runs:
           kcov="false"
         fi
 
-        workspace="$PWD"
-
         args=( \
           --no-profile \
           --no-boost \
           --no-quick \
           --format documentation \
           --color \
-          --reportdir "$workspace/$SETUP_REPORT_DIR" \
+          --reportdir "$SETUP_WORKSPACE_DIR/$SETUP_REPORT_DIR" \
           --output documentation \
           --output tap \
           --output junit \
-          --covdir "$workspace/$SETUP_COVERAGE_DIR" \
+          --covdir "$SETUP_WORKSPACE_DIR/$SETUP_COVERAGE_DIR" \
         )
 
         val_opt   --shell               "$INPUT_SHELL"
@@ -369,11 +368,12 @@ runs:
         printf '  shell: %s\n' "$INPUT_SHELLSPEC_SHELL"
         printf '  arguments: %s\n' "${args[*]}"
 
-        cd "$workspace/$INPUT_PROJECT_ROOT"
-        $INPUT_SHELLSPEC_SHELL "$workspace/$SETUP_REPO_DIR/shellspec" "${args[@]}"
+        cd "$SETUP_WORKSPACE_DIR/$INPUT_PROJECT_ROOT"
+        $INPUT_SHELLSPEC_SHELL "$SETUP_WORKSPACE_DIR/$SETUP_REPO_DIR/shellspec" "${args[@]}"
 
       shell: bash
       env:
+        SETUP_WORKSPACE_DIR: ${{ steps.setup.outputs.workspace-dir }}
         SETUP_COVERAGE_DIR: ${{ steps.setup.outputs.coverage-dir }}
         SETUP_REPO_DIR: ${{ steps.setup.outputs.repo-dir }}
         SETUP_REPORT_DIR: ${{ steps.setup.outputs.report-dir }}
